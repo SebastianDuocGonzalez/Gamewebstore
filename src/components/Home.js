@@ -41,16 +41,16 @@ const Home = () => {
     <div className="home-page">
       {/* Hero Section */}
       <section className="hero-section text-center text-white" style={{padding: '100px 0', background: 'linear-gradient(to right, #0f2027, #203a43, #2c5364)'}}>
-        <div className="container">
+        <div className="container hero-content">
           <h1 className="display-3 fw-bold mb-4">Bienvenido a GameZone Pro</h1>
           <p className="lead mb-5">El mejor hardware y videojuegos en un solo lugar.</p>
-          <Link to="/catalog" className="btn btn-custom btn-lg">Explorar Tienda</Link>
+          <Link to="/catalog" className="btn btn-primary btn-lg">Explorar Tienda</Link>
         </div>
       </section>
 
       {/* Productos Destacados */}
       <section className="py-5">
-        <div className="container">
+        <div className="container hero-content">
           <h2 className="text-center mb-5 text-white">Novedades</h2>
           <div className="row g-4">
             {featuredProducts.map(product => (

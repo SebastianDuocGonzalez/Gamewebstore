@@ -1,53 +1,24 @@
-// karma.conf.js
-const webpack = require('webpack');
+// karma.conf.js (Ejemplo de configuración necesaria para React)
+const webpackConfig = require('./webpack.config.js'); // Tu config de webpack existente
 
 module.exports = function(config) {
   config.set({
-    frameworks: ['jasmine', 'webpack'],
+     
+    // Framework: Usamos Jasmine
+    frameworks: ['jasmine','webpack'],
+
     files: [
       'src/components/Test/**/*.test.js'
     ],
+
     preprocessors: {
+      // Le decimos a Karma que pase los archivos por Webpack primero
       'src/components/Test/**/*.test.js': ['webpack']
     },
-    webpack: {
-      mode: 'development',
-      module: {
-        rules: [
-          {
-            test: /\.(js|jsx)$/,
-            exclude: /node_modules/,
-            use: {
-              loader: 'babel-loader',
-              options: {
-                presets: ['@babel/preset-env', '@babel/preset-react']
-              }
-            }
-          },
-          {
-            test: /\.css$/,
-            use: ['style-loader', 'css-loader']
-          }
-        ]
-      },
-      resolve: {
-        extensions: ['.js', '.jsx'],
-        alias: {
-            "process": "process/browser"
-        },
-        fallback: { 
-            "process": require.resolve("process/browser") 
-        } 
-      },
-      plugins: [
-        new webpack.ProvidePlugin({
-            process: 'process/browser',
-        }),
-      ]
-    },
-    browsers: ['Chrome'],
-    reporters: ['progress'],
-    singleRun: false,
-    autoWatch: true
+      
+    webpack: webpackConfig, // Pasamos la configuración para que entienda JSX/React
+    
+    browsers: ['ChromeHeadless'], 
+    singleRun: true
   });
 };
