@@ -36,30 +36,58 @@ const userReducer = (state, action) => {
 export const UserProvider = ({ children }) => {
   const [state, dispatch] = useReducer(userReducer, initialState);
 
-  // Al cargar la página, verificamos si hay sesión guardada
+  // Al cargar la página, verificamos si hay sesión guardada en localStorage
   useEffect(() => {
-    const user = getCurrentUser();
-    if (user) {
-      dispatch({ type: 'LOGIN_SUCCESS', payload: user });
+    // Intentamos recuperar el usuario del localStorage
+    const savedUser = localStorage.getItem('user_data');
+    if (savedUser) {
+        try {
+            const parsedUser = JSON.parse(savedUser);
+            dispatch({ type: 'LOGIN_SUCCESS', payload: parsedUser });
+        } catch (e) {
+            console.error("Error al leer usuario guardado", e);
+            localStorage.removeItem('user_data');
+            localStorage.removeItem('auth_token');
+        }
     }
   }, []);
 
-  const login = async (email, password) => {
+const login = async (email, password) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      const userData = await authLogin(email, password);
-      // userData debe venir del backend con el campo "rol" (ADMIN, TRABAJADOR, CLIENTE)
+      // 1. Generamos el token "Basic Auth" manualmente
+      // btoa() convierte un string a Base64
+      const token = 'Basic ' + btoa(email + ':' + password);
+
+      // 2. Llamamos al servicio (Asumimos que authLogin usa axios/fetch internamente)
+      // Nota: Tu auth.service debería aceptar este token o usar las credenciales para la llamada inicial.
+      const userData = await authLogin(email, password); 
+
+      // 3. ¡PASO CRÍTICO! Guardamos el token y el usuario en el navegador
+      // Esto permite que otras páginas (como Crear Producto) recuperen el token.
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('user_data', JSON.stringify(userData));
+
       dispatch({ type: 'LOGIN_SUCCESS', payload: userData });
       return { success: true, rol: userData.rol };
+
     } catch (error) {
-      const msg = error.response?.status === 401 ? 'Credenciales incorrectas' : 'Error de conexión';
+      console.error("Login error:", error);
+      const msg = error.response?.status === 401 
+        ? 'Credenciales incorrectas' 
+        : 'Error de conexión o servidor';
+      
       dispatch({ type: 'SET_ERROR', payload: msg });
       return { success: false, message: msg };
     }
   };
 
-  const logout = () => {
-    authLogout();
+const logout = () => {
+    // Limpiamos todo al salir
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_data');
+    
+    if (authLogout) authLogout(); // Llamada opcional si tu servicio hace algo extra
     dispatch({ type: 'LOGOUT' });
   };
 

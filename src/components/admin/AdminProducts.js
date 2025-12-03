@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api';
+import ProductService from '../../services/product.service'; // <--- 1. Importamos el servicio
 import { Table, Button, Container, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap';
 
 const AdminProducts = () => {
@@ -15,7 +15,7 @@ const AdminProducts = () => {
     descripcion: '',
     precio: '',
     stock: '',
-    tipo: 'VIDEOJUEGO', // Valor por defecto
+    tipo: 'VIDEOJUEGO', 
     imagen: ''
   });
 
@@ -26,7 +26,8 @@ const AdminProducts = () => {
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/productos');
+      // REFACTORIZADO: Usamos el servicio para obtener lista
+      const response = await ProductService.getAllProducts();
       setProducts(response.data);
     } catch (err) {
       setError('Error al cargar productos. Verifica que el servidor esté activo.');
@@ -72,21 +73,32 @@ const AdminProducts = () => {
   // Guardar (Crear o Actualizar)
   const handleSave = async (e) => {
     e.preventDefault();
+    setError(''); // Limpiar errores previos
+
+    // Preparar datos (Convertir tipos para Java)
+    const productData = {
+        ...formData,
+        precio: parseFloat(formData.precio), // Java espera número
+        stock: parseInt(formData.stock),     // Java espera entero
+    };
+
     try {
       if (editingProduct) {
-        // Actualizar
-        await api.put(`/productos/${editingProduct.id}`, formData);
+        // REFACTORIZADO: Actualizar vía servicio (inyecta token)
+        await ProductService.updateProduct(editingProduct.id, productData);
         alert('Producto actualizado correctamente');
       } else {
-        // Crear
-        await api.post('/productos', formData);
+        // REFACTORIZADO: Crear vía servicio (inyecta token) <--- AQUÍ ESTÁ LO QUE BUSCABAS
+        await ProductService.createProduct(productData);
         alert('Producto creado correctamente');
       }
       handleClose();
       fetchProducts(); // Recargar lista
     } catch (err) {
-      alert('Error al guardar el producto');
       console.error(err);
+      // Mostrar mensaje de error más específico si el backend lo envía
+      const msg = err.response?.data?.message || 'Error al guardar el producto (Verifica permisos)';
+      alert(msg);
     }
   };
 
@@ -94,10 +106,12 @@ const AdminProducts = () => {
   const handleDelete = async (id) => {
     if (window.confirm('¿Estás seguro de eliminar este producto? Esta acción no se puede deshacer.')) {
       try {
-        await api.delete(`/productos/${id}`);
+        // REFACTORIZADO: Eliminar vía servicio
+        await ProductService.deleteProduct(id);
         fetchProducts();
       } catch (err) {
-        alert('Error al eliminar el producto');
+        console.error(err);
+        alert('Error al eliminar el producto. Verifica que seas administrador.');
       }
     }
   };
@@ -133,7 +147,7 @@ const AdminProducts = () => {
                 <td>{prod.id}</td>
                 <td>{prod.nombre}</td>
                 <td><Badge bg="info">{prod.tipo}</Badge></td>
-                <td>${prod.precio}</td>
+                <td>${prod.precio?.toLocaleString()}</td>
                 <td>
                   <Badge bg={prod.stock > 0 ? 'success' : 'danger'}>
                     {prod.stock}
