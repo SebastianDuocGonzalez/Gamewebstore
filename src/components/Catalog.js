@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import api from '../services/api'
+import ProductService from '../services/product.service';
 import { Link } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { Container, Row, Col, Card, Button, Spinner, Badge, Form } from 'react-bootstrap';
@@ -13,17 +13,17 @@ const Catalog = () => {
   const [categories, setCategories] = useState([]);
   const { addToCart } = useCart();
 
-  useEffect(() => {
+useEffect(() => {
     const loadProducts = async () => {
       try {
         setLoading(true);
-        const response = await api.get('/productos');
+        //Llamada vía servicio
+        const response = await ProductService.getAllProducts();
         
-        // Lógica mejorada de imágenes
+        //lógica de imágenes
         const productsWithImages = response.data.map(p => ({
             ...p,
-            // Si el backend no trae imagen, usamos la función auxiliar
-            imagen: p.imagen && p.imagen.startsWith('http') ? p.imagen : getProductImage(p)
+            imagen: getSmartImage(p)
         }));
 
         setProducts(productsWithImages);
@@ -41,11 +41,13 @@ const Catalog = () => {
     loadProducts();
   }, []);
   // FUNCIÓN INTELIGENTE DE IMÁGENES
-  const getProductImage = (product) => {
-    // Normalizamos el nombre para buscar coincidencias
-    const name = product.nombre.toLowerCase();
-    
-    // 1. Intentamos asignar imágenes locales específicas (tienes que tenerlas en public/assets)
+  const getSmartImage = (product) => {
+    // 1. Prioridad: URL del backend
+    if (product.imagen && product.imagen.startsWith('http')) {
+        return product.imagen;
+    }
+    // 2. Intentamos asignar imágenes locales específicas (tienes que tenerlas en public/assets)
+    const name = product.nombre ? product.nombre.toLowerCase() : '';
     if (name.includes('playstation') || name.includes('ps5')) return '/assets/ps5.jpg';
     if (name.includes('xbox')) return '/assets/xbox.jpg';
     if (name.includes('nintendo') || name.includes('switch')) return '/assets/switch.jpg';
@@ -53,12 +55,13 @@ const Catalog = () => {
     if (name.includes('mouse')) return '/assets/mouse.jpg';
     if (name.includes('teclado')) return '/assets/keyboard.jpg';
 
-    // 2. Si no coincide, usamos imagen genérica por categoría
+    // 3. Si no coincide, usamos imagen genérica por categoría
     switch(product.tipo) {
-      case 'CONSOLA': return 'https://images.unsplash.com/photo-1486401899868-0e435ed85128?auto=format&fit=crop&w=400&q=80'; // Imagen real de Unsplash
-      case 'VIDEOJUEGO': return 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=400&q=80';
-      case 'ACCESORIO': return 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=400&q=80';
-      default: return '/public/assets/default-product.jpg';
+      case 'Consolas': return 'https://images.unsplash.com/photo-1486401899868-0e435ed85128?auto=format&fit=crop&w=400&q=80';
+      case 'Videojuegos': return 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=400&q=80';
+      case 'Accesorios': return 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=400&q=80';
+      case 'Equipos': return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=400&q=80';
+      default: return 'https://thumbs.dreamstime.com/z/error-109026446.jpg?ct=jpeg';// Fallback final
     }
   };
 
@@ -126,13 +129,13 @@ const Catalog = () => {
                     src={prod.imagen} 
                     style={{ height: '100%', objectFit: 'cover', transition: 'transform 0.3s' }} 
                     className="product-image"
-                    onError={(e) => {e.target.src = 'https://via.placeholder.com/400x300?text=Sin+Imagen'}} // Fallback por si falla la URL
+                    onError={(e) => {e.target.src = 'https://thumbs.dreamstime.com/z/error-109026446.jpg?ct=jpeg'}}
                 />
               </div>
               <Card.Body className="d-flex flex-column bg-dark bg-opacity-50">
                 <div className="d-flex justify-content-between align-items-start mb-2">
                   <Badge bg="info" className="bg-opacity-75">{prod.tipo}</Badge>
-                  <span className="text-success fw-bold">${prod.precio.toLocaleString()}</span>
+                  <span className="text-success fw-bold">${prod.precio?.toLocaleString()}</span>
                 </div>
                 <Card.Title className="fs-6 mb-2 text-truncate">{prod.nombre}</Card.Title>
                 

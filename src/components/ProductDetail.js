@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import ProductService from '../services/product.service'; // <--- Importamos el servicio
+import ProductService from '../services/product.service';
 import { useCart } from '../contexts/CartContext';
 
 const ProductDetail = () => {
@@ -10,17 +10,16 @@ const ProductDetail = () => {
   const [error, setError] = useState(null);
   const { addToCart } = useCart();
 
-  useEffect(() => {
+useEffect(() => {
     const fetchProduct = async () => {
       try {
-        setLoading(true);
-        
+        setLoading(true);        
         // REFACTORIZADO: Usamos el servicio en lugar de llamar a api directamente
         const response = await ProductService.getProductById(id);
-        
         const productData = response.data;
-        // Mantenemos tu lógica de imágenes local (está perfecta aquí o en un utils)
-        productData.imagen = getProductImage(productData);
+
+        //lógica de imágenes local (está perfecta aquí o en un utils)
+        productData.imagen = getSmartImage(productData);
         
         setProduct(productData);
       } catch (err) {
@@ -34,10 +33,15 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id]);
 
-  // --- Tu lógica de imágenes se mantiene igual ---
-  const getProductImage = (product) => {
-    const name = product.nombre ? product.nombre.toLowerCase() : '';
+  // --- Tu lógica de imágenes
+const getSmartImage = (product) => {
+    // 1. Backend URL
+    if (product.imagen && product.imagen.startsWith('http')) {
+        return product.imagen;
+    }
     
+    // 2. Local Assets
+    const name = product.nombre ? product.nombre.toLowerCase() : '';
     if (name.includes('playstation') || name.includes('ps5')) return '/assets/ps5.jpg';
     if (name.includes('xbox')) return '/assets/xbox.jpg';
     if (name.includes('nintendo') || name.includes('switch')) return '/assets/switch.jpg';
@@ -45,11 +49,13 @@ const ProductDetail = () => {
     if (name.includes('mouse')) return '/assets/mouse.jpg';
     if (name.includes('teclado')) return '/assets/keyboard.jpg';
 
+    // 3. Generic
     switch(product.tipo) {
-      case 'CONSOLA': return 'https://images.unsplash.com/photo-1486401899868-0e435ed85128?auto=format&fit=crop&w=400&q=80';
-      case 'VIDEOJUEGO': return 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=400&q=80';
-      case 'ACCESORIO': return 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=400&q=80';
-      default: return '/assets/default-product.jpg'; // Corregido path relativo si usas CRA/Vite
+      case 'Consolas': return 'https://images.unsplash.com/photo-1486401899868-0e435ed85128?auto=format&fit=crop&w=400&q=80';
+      case 'Videojuegos': return 'https://images.unsplash.com/photo-1552820728-8b83bb6b773f?auto=format&fit=crop&w=400&q=80';
+      case 'Accesorios': return 'https://images.unsplash.com/photo-1595225476474-87563907a212?auto=format&fit=crop&w=400&q=80';
+      case 'Equipos': return 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=400&q=80';
+      default: return 'https://thumbs.dreamstime.com/z/error-109026446.jpg?ct=jpeg';
     }
   };
 
@@ -60,12 +66,11 @@ const ProductDetail = () => {
     <div className="container py-5">
       <div className="row">
         <div className="col-md-6">
-           {/* Agregamos un onError por si la imagen falla */}
           <img 
             src={product.imagen} 
             alt={product.nombre} 
             className="img-fluid rounded shadow-lg"
-            onError={(e) => { e.target.onerror = null; e.target.src = '/assets/default-product.jpg'; }} 
+            onError={(e) => { e.target.onerror = null; e.target.src = 'https://thumbs.dreamstime.com/z/error-109026446.jpg?ct=jpeg'; }} 
           />
         </div>
         <div className="col-md-6 text-white">

@@ -6,7 +6,7 @@ const UserContext = createContext();
 const initialState = {
   user: null, // Objeto usuario completo { nombre, email, rol, ... }
   isAuthenticated: false,
-  isLoading: false,
+  isLoading: true,
   error: null
 };
 
@@ -38,34 +38,38 @@ export const UserProvider = ({ children }) => {
 
   // Al cargar la página, verificamos si hay sesión guardada en localStorage
   useEffect(() => {
-    // Intentamos recuperar el usuario del localStorage
     const savedUser = localStorage.getItem('user_data');
-    if (savedUser) {
+    const token = localStorage.getItem('auth_token');
+    if (savedUser && token) {
         try {
             const parsedUser = JSON.parse(savedUser);
             dispatch({ type: 'LOGIN_SUCCESS', payload: parsedUser });
         } catch (e) {
-            console.error("Error al leer usuario guardado", e);
             localStorage.removeItem('user_data');
             localStorage.removeItem('auth_token');
+            dispatch({ type: 'LOGOUT' });
         }
+    } else {
+        dispatch({ type: 'LOGOUT' });
     }
   }, []);
 
 const login = async (email, password) => {
     dispatch({ type: 'SET_LOADING', payload: true });
     try {
-      // 1. Generamos el token "Basic Auth" manualmente
-      // btoa() convierte un string a Base64
-      const token = 'Basic ' + btoa(email + ':' + password);
+      // Usamos el auth.service que conecta con el endpoint JWT ***
+      const response = await authLogin(email, password); 
 
-      // 2. Llamamos al servicio (Asumimos que authLogin usa axios/fetch internamente)
-      // Nota: Tu auth.service debería aceptar este token o usar las credenciales para la llamada inicial.
-      const userData = await authLogin(email, password); 
+     // El backend devuelve: { token: "...", rol: "ADMIN", nombre: "...", email: "..." }
+      const userData = {
+        nombre: response.nombre,
+        email: response.email,
+        rol: response.rol
+      };
 
       // 3. ¡PASO CRÍTICO! Guardamos el token y el usuario en el navegador
       // Esto permite que otras páginas (como Crear Producto) recuperen el token.
-      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user_data', JSON.stringify(userData));
 
       dispatch({ type: 'LOGIN_SUCCESS', payload: userData });
@@ -87,7 +91,7 @@ const logout = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('user_data');
     
-    if (authLogout) authLogout(); // Llamada opcional si tu servicio hace algo extra
+    authLogout();
     dispatch({ type: 'LOGOUT' });
   };
 

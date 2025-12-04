@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import ProductService from '../../services/product.service'; // <--- 1. Importamos el servicio
+import ProductService from '../../services/product.service';
 import { Table, Button, Container, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap';
 
 const AdminProducts = () => {

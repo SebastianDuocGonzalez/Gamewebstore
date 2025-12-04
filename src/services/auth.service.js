@@ -1,21 +1,22 @@
 import api from './api';
 
-// Función para codificar usuario:contraseña a Base64
+// Login contra endpoint JWT ***
 
 export const login = async (email, password) => {
-  const token = 'Basic ' + window.btoa(email + ":" + password);
   
+  //Login contra endpoint JWT ***
+  // El backend JWT espera { email, password } en el body.
   try {
-    // Usamos 'api' en lugar de 'axios'
-    // Ya no hace falta poner la URL completa, solo la parte final
-    const response = await api.get('/auth/me', {
-      headers: { Authorization: token } // Aquí sí lo pasamos explícito porque aún no está en localStorage
-    });
-    
-    if (response.data) {
-      localStorage.setItem('user', JSON.stringify(response.data));
-      localStorage.setItem('auth_token', token);
-    }
+    const response = await api.post('/auth/login', { email, password });
+    return response.data; // Devuelve { token, rol, nombre, email }
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const register = async (userData) => {
+  try {
+    const response = await api.post('/auth/register', userData);
     return response.data;
   } catch (error) {
     throw error;
@@ -41,15 +42,4 @@ export const getAuthHeader = () => {
     return {};
   }
   
-};
-
-export const register = async (userData) => {
-  try {
-    // userData debe ser un objeto: { nombre, email, password }
-    const response = await api.post('/auth/register', userData);
-    return response.data;
-  } catch (error) {
-    // Propagamos el error para manejarlo en la vista
-    throw error;
-  }
 };
