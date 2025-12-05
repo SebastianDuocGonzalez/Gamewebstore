@@ -74,14 +74,22 @@ const AdminProducts = () => {
   const handleSave = async (e) => {
     e.preventDefault();
     setError(''); // Limpiar errores previos
+    
+    const categoryMap = {
+        'VIDEOJUEGO': { id: 1 },
+        'CONSOLA': { id: 2 },
+        'ACCESORIO': { id: 3 },
+        'EQUIPO': { id: 4 }
+    };
 
     // Preparar datos (Convertir tipos para Java)
     const productData = {
         ...formData,
-        precio: parseFloat(formData.precio), // Java espera número
-        stock: parseInt(formData.stock),     // Java espera entero
+        precio: parseFloat(formData.precio),
+        stock: parseInt(formData.stock),
+        // Aquí está la magia: Enviamos el objeto categoría completo
+        categoria: categoryMap[formData.tipo] 
     };
-
     try {
       if (editingProduct) {
         // REFACTORIZADO: Actualizar vía servicio (inyecta token)

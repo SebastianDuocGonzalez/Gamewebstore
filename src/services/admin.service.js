@@ -1,20 +1,18 @@
-// Servicio temporal para datos de admin
-// Cuando tu Spring Boot tenga endpoints de estadísticas, cambiarás esto por llamadas axios.
+import api from './api';
 
+// Ahora obtenemos estadísticas REALES del backend
 export const getDashboardStats = async () => {
-    // Simulación de llamada a API
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          totalProductos: 12,      // Puedes cambiar esto a axios.get('/api/v1/productos/count')
-          totalUsuarios: 5,
-          totalOrdenes: 3,
-          totalVentas: 1500000,
-          ordenesPendientes: 1,
-          ordenesCompletadas: 2,
-          productosDestacados: 4,
-          categorias: 3
-        });
-      }, 500);
-    });
+    try {
+        const response = await api.get('/admin/dashboard');
+        return response.data; 
+    } catch (error) {
+        console.error("Error al obtener stats:", error);
+        // Fallback en caso de error para que no rompa la UI
+        return {            
+          totalProductos: 0,
+          totalUsuarios: 0,
+          totalOrdenes: 0,
+          totalVentas: 0
+        };
+    }
 };
