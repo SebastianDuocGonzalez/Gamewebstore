@@ -88,6 +88,9 @@ useEffect(() => {
                   <div className="card-body d-flex flex-column">
                     <h5 className="card-title text-truncate">{product.nombre}</h5>
                     <p className="card-text text-success fw-bold">${product.precio?.toLocaleString()}</p>
+                    <Link to={`/product/${product.id}`} className="btn btn-outline-light btn-sm">
+                    Ver Detalle
+                    </Link>
                     <button 
                         className="btn btn-primary btn-sm w-100 mt-auto"
                         onClick={() => addToCart(product)}

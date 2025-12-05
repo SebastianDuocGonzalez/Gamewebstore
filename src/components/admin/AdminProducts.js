@@ -75,6 +75,7 @@ const AdminProducts = () => {
     e.preventDefault();
     setError(''); // Limpiar errores previos
     
+    // Mapa de IDs según tu base de datos
     const categoryMap = {
         'VIDEOJUEGO': { id: 1 },
         'CONSOLA': { id: 2 },
@@ -84,11 +85,13 @@ const AdminProducts = () => {
 
     // Preparar datos (Convertir tipos para Java)
     const productData = {
-        ...formData,
+        nombre: formData.nombre,
+        descripcion: formData.descripcion,
         precio: parseFloat(formData.precio),
         stock: parseInt(formData.stock),
-        // Aquí está la magia: Enviamos el objeto categoría completo
-        categoria: categoryMap[formData.tipo] 
+        tipo: formData.tipo,
+        imagen: formData.imagen,
+        categoriaId: categoryMap[formData.tipo] 
     };
     try {
       if (editingProduct) {
@@ -118,8 +121,9 @@ const AdminProducts = () => {
         await ProductService.deleteProduct(id);
         fetchProducts();
       } catch (err) {
-        console.error(err);
-        alert('Error al eliminar el producto. Verifica que seas administrador.');
+      // Mostramos el error específico que devuelve el backend (ej: "categoriaId no debe ser nulo")
+      const msg = err.response?.data?.categoriaId || err.response?.data?.message || 'Error al guardar.';
+      alert('Error: ' + msg);
       }
     }
   };
