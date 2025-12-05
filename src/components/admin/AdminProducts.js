@@ -6,35 +6,22 @@ const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
   // Estado para el Modal (Crear/Editar)
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [formData, setFormData] = useState({
-    nombre: '',
-    descripcion: '',
-    precio: '',
-    stock: '',
-    tipo: 'VIDEOJUEGO', 
-    imagen: ''
+    nombre: '', descripcion: '', precio: '', stock: '', tipo: 'VIDEOJUEGO', imagen: ''
   });
 
-  useEffect(() => {
-    fetchProducts();
-  }, []);
+  useEffect(() => { fetchProducts(); }, []);
 
   const fetchProducts = async () => {
     try {
       setLoading(true);
-      // REFACTORIZADO: Usamos el servicio para obtener lista
       const response = await ProductService.getAllProducts();
-      setProducts(response.data);
-    } catch (err) {
-      setError('Error al cargar productos. Verifica que el servidor esté activo.');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+      setProducts(response.data.sort((a, b) => b.id - a.id));
+    } catch (err) { setError('Error al cargar productos.'); } 
+    finally { setLoading(false); }
   };
 
   // Manejo del formulario
@@ -53,21 +40,14 @@ const AdminProducts = () => {
         stock: product.stock,
         tipo: product.tipo,
         imagen: product.imagen || ''
-      });
+        });
     } else {
-      setEditingProduct(null);
-      setFormData({
-        nombre: '',
-        descripcion: '',
-        precio: '',
-        stock: '',
-        tipo: 'VIDEOJUEGO',
-        imagen: ''
-      });
+        setEditingProduct(null);
+        setFormData({ nombre: '', descripcion: '', precio: '', stock: '', tipo: 'VIDEOJUEGO', imagen: '' });
     }
     setShowModal(true);
   };
-
+  
   const handleClose = () => setShowModal(false);
 
   // Guardar (Crear o Actualizar)
@@ -91,8 +71,7 @@ const AdminProducts = () => {
         stock: parseInt(formData.stock),
         tipo: formData.tipo,
         imagen: formData.imagen,
-        categoriaId: categoryMap[formData.tipo],
-        categoria: { id: categoryMap[formData.tipo] }
+        categoriaId: categoryMap[formData.tipo] 
     };
     try {
       if (editingProduct) {
