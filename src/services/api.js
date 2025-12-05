@@ -14,10 +14,15 @@ const api = axios.create({
 // Antes de enviar cualquier petición, verifica si hay token
 api.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('auth_token');
     if (token) {
-      // Inyectamos el token Bearer automáticamente
-      config.headers['Authorization'] = `Bearer ${token}`;
+      // Verificamos si el token ya trae "Bearer " o no para evitar duplicados
+      if (token.startsWith('Bearer ')) {
+          config.headers['Authorization'] = token;
+      } else {
+          // Si es el token puro, le agregamos el prefijo
+          config.headers['Authorization'] = `Bearer ${token}`;
+      }
     }
     return config;
   },

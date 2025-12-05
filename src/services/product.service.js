@@ -1,5 +1,4 @@
 import api from './api';
-import { getAuthHeader } from './auth.service';
 
 const API_URL = '/productos';
 
@@ -13,25 +12,20 @@ const getProductById = (id) => {
   return api.get(`${API_URL}/${id}`);
 };
 
-// Crear producto (ADMIN - Requiere Auth)
+// Crear producto (ADMIN)
+// NOTA: Ya no pasamos { headers: ... } porque el interceptor lo hace.
 const createProduct = (productData) => {
-  return api.post(API_URL, productData, {
-    headers: getAuthHeader() // <--- ¡Aquí está la magia! Enviamos el token
-  });
+  return api.post(API_URL, productData);
 };
 
-// Actualizar producto (ADMIN - Requiere Auth)
+// Actualizar producto (ADMIN)
 const updateProduct = (id, productData) => {
-  return api.put(`${API_URL}/${id}`, productData, {
-    headers: getAuthHeader()
-  });
+  return api.put(`${API_URL}/${id}`, productData);
 };
 
-// Eliminar producto (ADMIN - Requiere Auth)
+// Eliminar producto (ADMIN)
 const deleteProduct = (id) => {
-  return api.delete(`${API_URL}/${id}`, {
-    headers: getAuthHeader()
-  });
+  return api.delete(`${API_URL}/${id}`);
 };
 
 const ProductService = {
