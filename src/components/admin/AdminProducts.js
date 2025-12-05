@@ -91,7 +91,8 @@ const AdminProducts = () => {
         stock: parseInt(formData.stock),
         tipo: formData.tipo,
         imagen: formData.imagen,
-        categoriaId: categoryMap[formData.tipo] 
+        categoriaId: categoryMap[formData.tipo],
+        categoria: { id: categoryMap[formData.tipo] }
     };
     try {
       if (editingProduct) {
