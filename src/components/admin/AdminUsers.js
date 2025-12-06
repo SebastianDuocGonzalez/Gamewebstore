@@ -11,6 +11,9 @@ const AdminUsers = () => {
   const { user: currentUser } = useUser(); // Para no auto-editarse
 
   // Importante: Asegúrate de tener este endpoint en tu UserController de SpringBoot
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const fetchUsers = async () => {
     try {
@@ -19,21 +22,25 @@ const AdminUsers = () => {
       setUsers(response.data);
     } catch (err) {
       console.error(err);
-      setError('Error al cargar usuarios.');
+        if (err.response && err.response.status === 403) {
+        setError('Acceso denegado: No tienes permisos de Administrador.');
+      } else {
+        setError('Error al cargar usuarios. Revisa la conexión con el Backend.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const handleRoleChange = async (userId, newRole) => {
+    const originalUsers = [...users];
     try {
-      // Llamada al nuevo endpoint del backend
-      await api.put(`/users/${userId}/rol`, { rol: newRole });
-      
       // Actualizamos la interfaz localmente para que se sienta rápido
       setUsers(users.map(u => 
         u.id === userId ? { ...u, rol: newRole } : u
       ));
+
+      await api.put(`/users/${userId}/rol`, { rol: newRole });
       
     } catch (err) {
       console.error(err);
@@ -47,20 +54,29 @@ const AdminUsers = () => {
       try {
         await api.delete(`/users/${id}`);
         setUsers(users.filter(u => u.id !== id));
-        alert('Usuario eliminado');
+        alert('Usuario eliminado correctamente');
       } catch (err) {
         alert('Error al eliminar usuario. Puede que tenga órdenes asociadas.');
       }
     }
   };
 
-  if (loading) return <div className="text-center py-5"><Spinner animation="border" variant="success" /></div>;
+  if (loading) return (
+    <div className="text-center py-5 mt-5">
+      <Spinner animation="border" variant="primary" />
+      <p className="text-white mt-2">Cargando usuarios...</p>
+    </div>
+  );
 
   return (
     <Container className="py-5">
       <h2 className="text-white mb-4">Gestión de Usuarios y Roles</h2>
 
-      {error && <Alert variant="warning">{error}</Alert>}
+      {error && <Alert variant="danger">{error}</Alert>}
+
+      {!loading && users.length === 0 && !error && (
+        <Alert variant="info">No hay usuarios registrados.</Alert>
+      )}
 
       <div className="card bg-dark border-secondary">
         <div className="card-body p-0">
@@ -81,13 +97,12 @@ const AdminUsers = () => {
                   <td>{u.nombre}</td>
                   <td>{u.email}</td>
                   <td>
-                    {/* Si es el mismo admin logueado, mostramos Badge fijo para evitar accidentes */}
                     {currentUser && currentUser.email === u.email ? (
                         <Badge bg="danger">ADMIN (Tú)</Badge>
                     ) : (
                         <Form.Select 
                             size="sm"
-                            value={u.rol}
+                            value={u.rol} // Asegúrate que coincida con "ADMIN", "TRABAJADOR", etc.
                             onChange={(e) => handleRoleChange(u.id, e.target.value)}
                             className={
                                 u.rol === 'ADMIN' ? 'bg-danger text-white border-danger' :
@@ -95,9 +110,9 @@ const AdminUsers = () => {
                                 'bg-secondary text-white border-secondary'
                             }
                         >
-                            <option value="CLIENTE">Cliente</option>
-                            <option value="TRABAJADOR">Trabajador</option>
-                            <option value="ADMIN">Admin</option>
+                            <option value="CLIENTE">CLIENTE</option>
+                            <option value="TRABAJADOR">TRABAJADOR</option>
+                            <option value="ADMIN">ADMIN</option>
                         </Form.Select>
                     )}
                   </td>
@@ -107,6 +122,7 @@ const AdminUsers = () => {
                       size="sm" 
                       onClick={() => handleDelete(u.id)}
                       disabled={currentUser && currentUser.email === u.email}
+                      title="Eliminar usuario"
                     >
                       <i className="bi bi-trash"></i>
                     </Button>

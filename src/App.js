@@ -70,7 +70,7 @@ function App() {
                 
                 {/* Rutas Protegidas para ADMINISTRADORES */}
               <Route path="/admin/*" element={
-                <ProtectedRoute allowedRoles={['ADMIN']}>
+                <ProtectedRoute allowedRoles={['ADMIN','TRABAJADOR']}>
                   <Routes>
                     <Route path="/" element={<AdminDashboard />} />
                     <Route path="products" element={<AdminProducts />} />
