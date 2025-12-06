@@ -66,12 +66,10 @@ const AdminProducts = () => {
     setError(''); // Limpiar errores previos
     
     // Mapa de IDs según tu base de datos
-    const categoryMap = {
-        'VIDEOJUEGO': { id: 1 },
-        'CONSOLA': { id: 2 },
-        'ACCESORIO': { id: 3 },
-        'EQUIPO': { id: 4 }
-    };
+    let catId = 1; // Default VIDEOJUEGO
+    if (formData.tipo === 'CONSOLA') catId = 2;
+    if (formData.tipo === 'ACCESORIO') catId = 3;
+    if (formData.tipo === 'EQUIPO') catId = 4;
 
     // Preparar datos (Convertir tipos para Java)
     const productData = {
@@ -81,8 +79,11 @@ const AdminProducts = () => {
         stock: parseInt(formData.stock),
         tipo: formData.tipo,
         imagen: formData.imagen,
-        categoriaId: categoryMap[formData.tipo] 
+        categoriaId: catId 
     };
+
+    console.log("Enviando Payload:", JSON.stringify(productData)); 
+
     try {
       if (editingProduct) {
         // REFACTORIZADO: Actualizar vía servicio (inyecta token)
