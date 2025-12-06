@@ -19,9 +19,12 @@ const AdminProducts = () => {
     try {
       setLoading(true);
       const response = await ProductService.getAllProducts();
-      setProducts(response.data.sort((a, b) => b.id - a.id));
-    } catch (err) { setError('Error al cargar productos.'); } 
-    finally { setLoading(false); }
+      const sorted = response.data.sort((a, b) => b.id - a.id);
+      setProducts(sorted);
+    } catch (err) {
+      setError('Error al cargar productos.');
+      console.error(err);
+    } finally { setLoading(false); }
   };
 
   // Manejo del formulario
@@ -40,10 +43,17 @@ const AdminProducts = () => {
         stock: product.stock,
         tipo: product.tipo,
         imagen: product.imagen || ''
-        });
+      });
     } else {
-        setEditingProduct(null);
-        setFormData({ nombre: '', descripcion: '', precio: '', stock: '', tipo: 'VIDEOJUEGO', imagen: '' });
+      setEditingProduct(null);
+      setFormData({
+        nombre: '',
+        descripcion: '',
+        precio: '',
+        stock: '',
+        tipo: 'VIDEOJUEGO',
+        imagen: ''
+      });
     }
     setShowModal(true);
   };
@@ -88,8 +98,8 @@ const AdminProducts = () => {
     } catch (err) {
       console.error(err);
       // Mostrar mensaje de error más específico si el backend lo envía
-      const msg = err.response?.data?.message || 'Error al guardar el producto (Verifica permisos)';
-      alert(msg);
+      const msg = err.response?.data?.message || 'Error al guardar. Revisa los datos.';
+      alert('Error: ' + msg);
     }
   };
 
@@ -114,9 +124,7 @@ const AdminProducts = () => {
     <Container className="py-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="text-white">Gestión de Productos</h2>
-        <Button variant="success" onClick={() => handleShow()}>
-          <i className="bi bi-plus-lg me-2"></i> Nuevo Producto
-        </Button>
+        <Button variant="success" onClick={() => handleShow()}>+ Nuevo Producto</Button>
       </div>
 
       {error && <Alert variant="danger">{error}</Alert>}
@@ -140,16 +148,12 @@ const AdminProducts = () => {
                 <td>{prod.nombre}</td>
                 <td><Badge bg="info">{prod.tipo}</Badge></td>
                 <td>${prod.precio?.toLocaleString()}</td>
+                <td><Badge bg={prod.stock > 0 ? 'success' : 'danger'}>{prod.stock}</Badge></td>
                 <td>
-                  <Badge bg={prod.stock > 0 ? 'success' : 'danger'}>
-                    {prod.stock}
-                  </Badge>
-                </td>
-                <td>
-                  <Button variant="outline-warning" size="sm" className="me-2" onClick={() => handleShow(prod)}>
+                  <Button variant="warning" size="sm" className="me-2" onClick={() => handleShow(prod)}>
                     <i className="bi bi-pencil"></i>
                   </Button>
-                  <Button variant="outline-danger" size="sm" onClick={() => handleDelete(prod.id)}>
+                  <Button variant="danger" size="sm" onClick={() => handleDelete(prod.id)}>
                     <i className="bi bi-trash"></i>
                   </Button>
                 </td>
@@ -159,7 +163,6 @@ const AdminProducts = () => {
         </Table>
       </div>
 
-      {/* Modal de Creación/Edición */}
       <Modal show={showModal} onHide={handleClose} backdrop="static" keyboard={false} centered className="text-dark">
         <Modal.Header closeButton className="bg-dark text-white border-secondary">
           <Modal.Title>{editingProduct ? 'Editar Producto' : 'Nuevo Producto'}</Modal.Title>
@@ -189,7 +192,7 @@ const AdminProducts = () => {
                 </div>
             </div>
             <Form.Group className="mb-3">
-              <Form.Label>Tipo</Form.Label>
+              <Form.Label>Tipo / Categoría</Form.Label>
               <Form.Select name="tipo" value={formData.tipo} onChange={handleInputChange} className="bg-secondary text-white border-0">
                 <option value="VIDEOJUEGO">Videojuego</option>
                 <option value="CONSOLA">Consola</option>
