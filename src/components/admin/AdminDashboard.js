@@ -52,7 +52,7 @@ const AdminDashboard = () => {
         </p>
 
         {/* Tarjetas de Estadísticas (Solo visibles para ciertos roles si quisieras filtrar) */}
-        {stats && (
+        {hasRole('ADMIN') && stats && (
           <div className="row g-4 mb-5">
             <div className="col-md-3">
               <div className="card bg-dark text-white border-primary h-100">
@@ -111,11 +111,25 @@ const AdminDashboard = () => {
                     )}
                     
                     {/* ADMIN y TRABAJADOR pueden ver órdenes */}
+                    {hasRole('TRABAJADOR') && (
+                    <>
                     <div className="col-md-4">
                         <Link to="/admin/orders" className="btn btn-warning w-100">
                           <i className="bi bi-receipt me-2"></i>Ver Órdenes
                         </Link>
                     </div>
+                    <div className="col-md-4">
+                        <Link to="/admin/products" className="btn btn-primary w-100">
+                          <i className="bi bi-box-seam me-2"></i>Gestionar Productos
+                        </Link>
+                    </div>
+                    <div className="col-md-4">
+                        <Link to="/admin/users" className="btn btn-success w-100">
+                          <i className="bi bi-people me-2"></i>Gestionar Usuarios
+                        </Link>
+                    </div>
+                    </>
+                    )}
                 </div>
             </div>
         </div>

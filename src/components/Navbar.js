@@ -74,10 +74,8 @@ const AppNavbar = () => {
                       <Dropdown.Item as={Link} to="/admin" onClick={() => setExpanded(false)}>Dashboard</Dropdown.Item>
                       <Dropdown.Item as={Link} to="/admin/products" onClick={() => setExpanded(false)}>Productos</Dropdown.Item>
                       <Dropdown.Item as={Link} to="/admin/orders" onClick={() => setExpanded(false)}>Órdenes</Dropdown.Item>
+                      <Dropdown.Item as={Link} to="/admin/users" onClick={() => setExpanded(false)}>Usuarios</Dropdown.Item>
                     </>
-                  )}
-                  {hasRole('ADMIN') && (
-                     <Dropdown.Item as={Link} to="/admin/users" onClick={() => setExpanded(false)}>Usuarios</Dropdown.Item>
                   )}
                   
                   <Dropdown.Divider />
