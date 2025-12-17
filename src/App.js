@@ -14,11 +14,9 @@ import Cart from './components/Cart';
 import ProductDetail from './components/ProductDetail';
 import Login from './components/Login';       
 import Register from './components/Register';
-
-// Nota: Si no tienes News/Events/Profile creados aún, coméntalos o crea archivos vacíos
-// import Profile from './components/Profile'; 
-// import News from './components/News';
-// import Events from './components/Events';
+import Profile from './components/Profile'; 
+import News from './components/News';
+import Events from './components/Events';
 
 // Componentes de Admin
 import AdminDashboard from './components/admin/AdminDashboard';
@@ -71,10 +69,9 @@ function App() {
                 <Route path="/product/:id" element={<ProductDetail />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} /> 
-                {/* Rutas Pendientes (Descomentar cuando crees los archivos) */}
-                {/* <Route path="/profile" element={<Profile />} /> */}
-                {/* <Route path="/news" element={<News />} /> */}
-                {/* <Route path="/events" element={<Events />} /> */}
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/events" element={<Events />} />
                 
                 {/* Rutas Protegidas para ADMINISTRADORES */}
               <Route path="/admin/*" element={
