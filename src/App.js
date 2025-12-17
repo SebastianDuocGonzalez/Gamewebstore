@@ -15,8 +15,8 @@ import ProductDetail from './components/ProductDetail';
 import Login from './components/Login';       
 import Register from './components/Register';
 import Profile from './components/Profile'; 
-import News from './components/News';
-import Events from './components/Events';
+import News from './components/New';
+import Events from './components/Event';
 
 // Componentes de Admin
 import AdminDashboard from './components/admin/AdminDashboard';
