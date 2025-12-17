@@ -107,6 +107,11 @@ const AdminDashboard = () => {
                               <i className="bi bi-people me-2"></i>Gestionar Usuarios
                             </Link>
                         </div>
+                        <div className="col-md-4">
+                          <Link to="/admin/orders" className="btn btn-warning w-100">
+                            <i className="bi bi-receipt me-2"></i>Ver Órdenes
+                          </Link>
+                        </div>
                       </>
                     )}
                     
@@ -120,12 +125,12 @@ const AdminDashboard = () => {
                     </div>
                     <div className="col-md-4">
                         <Link to="/admin/products" className="btn btn-primary w-100">
-                          <i className="bi bi-box-seam me-2"></i>Gestionar Productos
+                          <i className="bi bi-box-seam me-2"></i>Ver Productos
                         </Link>
                     </div>
                     <div className="col-md-4">
                         <Link to="/admin/users" className="btn btn-success w-100">
-                          <i className="bi bi-people me-2"></i>Gestionar Usuarios
+                          <i className="bi bi-people me-2"></i>Ver Usuarios
                         </Link>
                     </div>
                     </>
