@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Container, Table, Button, Modal, Spinner, Alert } from 'react-bootstrap';
 import OrderService from '../../services/order.service'; // *** CAMBIO: Usar servicio real
 
@@ -8,6 +9,7 @@ const AdminOrders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchOrders();
@@ -39,6 +41,20 @@ const AdminOrders = () => {
     <Container className="py-5">
       <h2 className="text-white mb-4">Gestión de Órdenes (Ventas)</h2>
       {error && <Alert variant="danger">{error}</Alert>}
+
+    <div className="container">
+        {/* Botón de Volver */}
+        <button 
+          className="btn-volver" 
+          onClick={() => navigate(-1)} // -1 regresa a la página anterior
+          style={{ marginBottom: '20px', padding: '8px 16px', cursor: 'pointer' }}
+        >
+          ⬅ Volver
+        </button>
+
+        <h2>Gestión de Productos</h2>
+        {/* ... resto de tu tabla */}
+      </div>
 
       <div className="table-responsive">
         <Table striped bordered hover variant="dark">

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ProductService from '../../services/product.service';
 import { Table, Button, Container, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap';
 import { useUser } from '../../contexts/UserContext';
@@ -8,6 +9,7 @@ const AdminProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const navigate = useNavigate();
 
   // Estado para el Modal (Crear/Editar)
   const [showModal, setShowModal] = useState(false);
@@ -135,8 +137,21 @@ const AdminProducts = () => {
       </div>
       )}
 
-
       {error && <Alert variant="danger">{error}</Alert>}
+
+          <div className="container">
+        {/* Botón de Volver */}
+        <button 
+          className="btn-volver" 
+          onClick={() => navigate(-1)} // -1 regresa a la página anterior
+          style={{ marginBottom: '20px', padding: '8px 16px', cursor: 'pointer' }}
+        >
+          ⬅ Volver
+        </button>
+
+        <h2>Gestión de Productos</h2>
+        {/* ... resto de tu tabla */}
+      </div>
 
       <div className="table-responsive">
         <Table striped bordered hover variant="dark">

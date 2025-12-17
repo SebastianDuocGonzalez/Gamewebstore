@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../../services/api';
 import { Table, Button, Container, Alert, Spinner, Form, Badge } from 'react-bootstrap';
 import { useUser } from '../../contexts/UserContext';
@@ -9,6 +10,7 @@ const AdminUsers = () => {
   const [users, setUsers] = useState([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchUsers();
@@ -30,7 +32,7 @@ const AdminUsers = () => {
       setLoading(false);
     }
   };
-
+  
   const handleRoleChange = async (userId, newRole) => {
     const originalUsers = [...users];
     try {
@@ -78,6 +80,20 @@ const AdminUsers = () => {
       {!loading && users.length === 0 && !error && (
         <Alert variant="info">No hay usuarios registrados.</Alert>
       )}
+
+      <div className="container">
+        {/* Botón de Volver */}
+        <button 
+          className="btn-volver" 
+          onClick={() => navigate(-1)} // -1 regresa a la página anterior
+          style={{ marginBottom: '20px', padding: '8px 16px', cursor: 'pointer' }}
+        >
+          ⬅ Volver
+        </button>
+
+        <h2>Gestión de Productos</h2>
+        {/* ... resto de tu tabla */}
+      </div>
 
       <div className="card bg-dark border-secondary">
         <div className="card-body p-0">
