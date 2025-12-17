@@ -1,0 +1,12 @@
+Un resumen técnico para que otros desarrolladores (o tu app Android) sepan cómo conectarse.
+
+Base URL: https://[tu-app-en-render].onrender.com/api
+
+Método,Endpoint,Rol Requerido,Descripción
+POST,/auth/login,Público,"Recibe JSON (user, pass), devuelve JWT."
+POST,/auth/register,Público,Crea un nuevo usuario Cliente.
+GET,/productos,Público,Lista todos los productos disponibles.
+POST,/productos,ADMIN,Crea un nuevo producto.
+PUT,/productos/{id},ADMIN,Actualiza stock o precio.
+DELETE,/productos/{id},ADMIN,Elimina un producto lógico/físico.
+GET,/ordenes/usuario/{id},AUTH,Obtiene historial de compras del usuario.

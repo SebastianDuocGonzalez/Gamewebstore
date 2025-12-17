@@ -1,0 +1,31 @@
+Este documento explica cómo usar el sistema.
+
+2.1 Perfil: Administrador
+
+Acceso: Login con credenciales de Admin.
+
+Funciones:
+
+Gestor de Usuarios: Puede ver la lista de usuarios y editar roles. Nota: No puede degradar a otros administradores.
+
+Gestor de Productos: Botón "Nuevo Producto" para añadir stock. Botones "Editar/Eliminar" en la tabla.
+
+Gestor de Órdenes: Visión total de las ventas.
+
+2.2 Perfil: Trabajador
+
+Acceso: Login con credenciales de personal.
+
+Limitaciones:
+
+Puede ver el listado de productos y órdenes para preparar despachos.
+
+No tiene acceso a eliminar productos ni cambiar roles de usuario.
+
+Visualiza el estado de las órdenes pero no puede eliminarlas.
+
+2.3 Perfil: Cliente
+
+Navegación: Puede recorrer "Inicio", "Tienda", "Noticias" y "Eventos".
+
+Compra: Selección de productos -> Añadir al Carrito -> Checkout -> Ver historial en "Mi Perfil".

@@ -1,0 +1,21 @@
+Este documento explica cómo se hablan las partes del sistema.
+
+5.1 Arquitectura de Integración El sistema utiliza una arquitectura RESTful.
+
+Cliente (React/Android): Realiza peticiones HTTP (GET, POST, etc.) usando axios o fetch.
+
+Seguridad: En cada petición protegida, el Cliente envía el header: Authorization: Bearer [TOKEN_JWT].
+
+Servidor (Spring Boot): Procesa la solicitud, consulta a PostgreSQL y responde con datos en formato JSON.
+
+5.2 Flujo de Datos (Ejemplo: Compra)
+
+React envía POST /api/ordenes con la lista de IDs de productos.
+
+Spring Boot verifica el Token JWT.
+
+Spring Boot verifica Stock en la BDD.
+
+Si hay stock -> Resta stock -> Crea Orden -> Responde 201 Created.
+
+Si no hay stock -> Responde 400 Bad Request
