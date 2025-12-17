@@ -98,24 +98,22 @@ const AdminUsers = () => {
                   <td>{u.nombre}</td>
                   <td>{u.email}</td>
                   <td>
-                    {isAdmin && currentUser && currentUser.email === u.email ? (
-                      <Badge bg={u.rol === 'ADMIN' ? 'danger' : u.rol === 'TRABAJADOR' ? 'warning' : 'info'}>
-                      {u.rol}
-                    </Badge>
+                    {isAdmin ? (                        
+                      <Form.Select 
+                        size="sm"
+                        value={u.rol} // Asegúrate que coincida con "ADMIN", "TRABAJADOR", etc.
+                        onChange={(e) => handleRoleChange(u.id, e.target.value)}
+                        className={
+                            u.rol === 'ADMIN' ? 'bg-danger text-white border-danger' :
+                            u.rol === 'TRABAJADOR' ? 'bg-warning text-dark border-warning' :
+                            'bg-secondary text-white border-secondary'
+                        }>
+                        <option value="CLIENTE">CLIENTE</option>
+                        <option value="TRABAJADOR">TRABAJADOR</option>
+                        <option value="ADMIN">ADMIN</option>
+                      </Form.Select>
                     ) : (
-                        <Form.Select 
-                            size="sm"
-                            value={u.rol} // Asegúrate que coincida con "ADMIN", "TRABAJADOR", etc.
-                            onChange={(e) => handleRoleChange(u.id, e.target.value)}
-                            className={
-                                u.rol === 'ADMIN' ? 'bg-danger text-white border-danger' :
-                                u.rol === 'TRABAJADOR' ? 'bg-warning text-dark border-warning' :
-                                'bg-secondary text-white border-secondary'
-                            }>
-                            <option value="CLIENTE">CLIENTE</option>
-                            <option value="TRABAJADOR">TRABAJADOR</option>
-                            <option value="ADMIN">ADMIN</option>
-                        </Form.Select>
+                      <span>{u.rol}</span>
                     )}
                   </td>
                   <td>

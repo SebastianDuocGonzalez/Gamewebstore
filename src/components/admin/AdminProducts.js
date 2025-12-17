@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import ProductService from '../../services/product.service';
 import { Table, Button, Container, Modal, Form, Alert, Spinner, Badge } from 'react-bootstrap';
+import { useUser } from '../../contexts/UserContext';
 
 const AdminProducts = () => {
+  const { user: currentUser } = useUser(); // Para no auto-editarse
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
   // Estado para el Modal (Crear/Editar)
   const [showModal, setShowModal] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
@@ -121,12 +124,17 @@ const AdminProducts = () => {
 
   if (loading) return <div className="text-center py-5"><Spinner animation="border" variant="primary" /></div>;
 
+  const isAdmin = currentUser?.rol === 'ADMIN';
+
   return (
     <Container className="py-5">
+      {isAdmin && (
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h2 className="text-white">Gestión de Productos</h2>
         <Button variant="success" onClick={() => handleShow()}>+ Nuevo Producto</Button>
       </div>
+      )}
+
 
       {error && <Alert variant="danger">{error}</Alert>}
 
@@ -139,7 +147,7 @@ const AdminProducts = () => {
               <th>Tipo</th>
               <th>Precio</th>
               <th>Stock</th>
-              <th>Acciones</th>
+              {isAdmin && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -150,6 +158,7 @@ const AdminProducts = () => {
                 <td><Badge bg="info">{prod.tipo}</Badge></td>
                 <td>${prod.precio?.toLocaleString()}</td>
                 <td><Badge bg={prod.stock > 0 ? 'success' : 'danger'}>{prod.stock}</Badge></td>
+                {isAdmin && (
                 <td>
                   <Button variant="warning" size="sm" className="me-2" onClick={() => handleShow(prod)}>
                     <i className="bi bi-pencil"></i>
@@ -158,6 +167,7 @@ const AdminProducts = () => {
                     <i className="bi bi-trash"></i>
                   </Button>
                 </td>
+                )}
               </tr>
             ))}
           </tbody>
