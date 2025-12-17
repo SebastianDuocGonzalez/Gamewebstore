@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import api from '../../services/api'; // El interceptor ya maneja el token
+import api from '../../services/api';
 import { Table, Button, Container, Alert, Spinner, Form, Badge } from 'react-bootstrap';
 import { useUser } from '../../contexts/UserContext';
 
 
 const AdminUsers = () => {
-  const [users, setUsers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
   const { user: currentUser } = useUser(); // Para no auto-editarse
+  const [users, setUsers] = useState([]);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
 
-  // Importante: Asegúrate de tener este endpoint en tu UserController de SpringBoot
   useEffect(() => {
     fetchUsers();
   }, []);
@@ -39,9 +38,9 @@ const AdminUsers = () => {
       setUsers(users.map(u => 
         u.id === userId ? { ...u, rol: newRole } : u
       ));
-
       await api.put(`/users/${userId}/rol`, { rol: newRole });
-      
+      fetchUsers(); // Recargar lista para asegurar consistencia
+      alert('Rol actualizado correctamente');
     } catch (err) {
       console.error(err);
       alert('Error al cambiar el rol. Verifica permisos.');
@@ -68,6 +67,8 @@ const AdminUsers = () => {
     </div>
   );
 
+  const isAdmin = currentUser?.rol === 'ADMIN';
+
   return (
     <Container className="py-5">
       <h2 className="text-white mb-4">Gestión de Usuarios y Roles</h2>
@@ -87,7 +88,7 @@ const AdminUsers = () => {
                 <th>Nombre</th>
                 <th>Email</th>
                 <th style={{width: '200px'}}>Rol</th>
-                <th>Acciones</th>
+                {isAdmin && <th>Acciones</th>}
               </tr>
             </thead>
             <tbody>
@@ -97,8 +98,10 @@ const AdminUsers = () => {
                   <td>{u.nombre}</td>
                   <td>{u.email}</td>
                   <td>
-                    {currentUser && currentUser.email === u.email ? (
-                        <Badge bg="danger">ADMIN (Tú)</Badge>
+                    {isAdmin && currentUser && currentUser.email === u.email ? (
+                      <Badge bg={u.rol === 'ADMIN' ? 'danger' : u.rol === 'TRABAJADOR' ? 'warning' : 'info'}>
+                      {u.rol}
+                    </Badge>
                     ) : (
                         <Form.Select 
                             size="sm"
@@ -108,8 +111,7 @@ const AdminUsers = () => {
                                 u.rol === 'ADMIN' ? 'bg-danger text-white border-danger' :
                                 u.rol === 'TRABAJADOR' ? 'bg-warning text-dark border-warning' :
                                 'bg-secondary text-white border-secondary'
-                            }
-                        >
+                            }>
                             <option value="CLIENTE">CLIENTE</option>
                             <option value="TRABAJADOR">TRABAJADOR</option>
                             <option value="ADMIN">ADMIN</option>
@@ -117,15 +119,16 @@ const AdminUsers = () => {
                     )}
                   </td>
                   <td>
+                    {isAdmin && (
                     <Button 
                       variant="outline-danger" 
                       size="sm" 
                       onClick={() => handleDelete(u.id)}
                       disabled={currentUser && currentUser.email === u.email}
-                      title="Eliminar usuario"
-                    >
+                      title="Eliminar usuario">
                       <i className="bi bi-trash"></i>
                     </Button>
+                  )}
                   </td>
                 </tr>
               ))}
