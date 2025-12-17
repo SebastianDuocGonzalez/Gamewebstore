@@ -45,6 +45,14 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+const AdminHomeRedirect = () => {
+  const { user } = useUser();
+  if (user && user.rol === 'TRABAJADOR') {
+    return <Navigate to="/admin/orders" replace />;
+  }
+  return <AdminDashboard />;
+};
+
 function App() {
   return (
     <UserProvider>
@@ -72,7 +80,7 @@ function App() {
               <Route path="/admin/*" element={
                 <ProtectedRoute allowedRoles={['ADMIN','TRABAJADOR']}>
                   <Routes>
-                    <Route path="/" element={<AdminDashboard />} />
+                    <Route path="/" element={<AdminHomeRedirect />} />
                     <Route path="products" element={<AdminProducts />} />
                     <Route path="users" element={<AdminUsers />} />
                     <Route path="orders" element={<AdminOrders />} />

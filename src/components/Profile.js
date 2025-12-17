@@ -2,11 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Card, Form, Button, Badge, Table } from 'react-bootstrap';
 import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
+import api from '../services/api';
 
 const Profile = () => {
   const { user, logout } = useUser();
   const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
+  const [orders, setOrders] = useState([]);
   
   // Estado local para el formulario (inicializado con datos del usuario)
   const [formData, setFormData] = useState({
@@ -24,6 +26,9 @@ const Profile = () => {
         telefono: user.telefono || '',
         password: ''
       });
+      api.get('/mis-ordenes')
+           .then(res => setOrders(res.data))
+           .catch(err => console.error("Error cargando ordenes", err));
     }
   }, [user]);
 
@@ -147,13 +152,24 @@ const Profile = () => {
                           <th>Estado</th>
                         </tr>
                       </thead>
-                      <tbody>
-                        <tr>
-                          <td colSpan="4" className="text-center text-muted py-3">
-                            No tienes pedidos recientes.
-                          </td>
-                        </tr>
-                      </tbody>
+                        <tbody>
+                            {orders.length > 0 ? orders.map(orden => (
+                                <tr key={orden.id}>
+                                    <td>#{orden.id}</td>
+                                    <td>{new Date(orden.fecha).toLocaleDateString()} {new Date(orden.fecha).toLocaleTimeString()}</td>
+                                    <td>${orden.total}</td>
+                                    <td>
+                                        <Badge bg="success">Completado</Badge> {/* O usa el estado real si lo tienes */}
+                                    </td>
+                                </tr>
+                            )) : (
+                                <tr>
+                                    <td colSpan="4" className="text-center text-muted py-3">
+                                        No tienes pedidos recientes.
+                                    </td>
+                                </tr>
+                            )}
+                        </tbody>
                     </Table>
                   </div>
                 </div>
